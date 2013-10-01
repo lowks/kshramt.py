@@ -4,7 +4,7 @@ import unittest
 import collections
 
 
-__version__ = '0.0.0'
+__version__ = '0.0.1'
 
 
 class Error(Exception):
@@ -31,7 +31,8 @@ def flatten(vs):
     else:
         for v in vs:
             if isinstance(v, collections.abc.Iterable):
-                yield from flatten(v)
+                for v_ in flatten(v):
+                    yield v_
             else:
                 yield v
 
