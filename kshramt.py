@@ -2,18 +2,19 @@ import sys
 import argparse
 import unittest
 import collections
+import pprint
 
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 
 class Error(Exception):
     pass
 
 
-def p(v):
-    print(v, file=sys.stderr)
-    return v
+def pp(x):
+    pprint.pprint(x, stream=sys.stderr)
+    return x
 
 
 def flatten(xss):
