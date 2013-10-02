@@ -16,7 +16,7 @@ def p(v):
     return v
 
 
-def flatten(vs):
+def flatten(xss):
     """
     # Flatten containers
 
@@ -26,15 +26,15 @@ def flatten(vs):
     ## Exceptions
     - `RuntimeError`: Recursive elements will cause this
     """
-    if isinstance(vs, str):
-        yield vs
+    if isinstance(xss, str):
+        yield xss
     else:
-        for v in vs:
-            if isinstance(v, collections.abc.Iterable):
-                for v_ in flatten(v):
-                    yield v_
+        for xs in xss:
+            if isinstance(xs, collections.abc.Iterable):
+                for x in flatten(xs):
+                    yield x
             else:
-                yield v
+                yield xs
 
 
 def list_2d(n_row, n_column):
