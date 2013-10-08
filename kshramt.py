@@ -5,7 +5,7 @@ import collections
 import pprint
 
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 
 
 class Error(Exception):
