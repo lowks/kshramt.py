@@ -31,7 +31,7 @@ def flatten(xss):
         yield xss
     else:
         for xs in xss:
-            if isinstance(xs, collections.abc.Iterable):
+            if isinstance(xs, collections.Iterable):
                 for x in flatten(xs):
                     yield x
             else:
