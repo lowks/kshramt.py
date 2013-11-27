@@ -51,30 +51,23 @@ def list_2d(n_row, n_column):
 
 def make_fixed_format_parser(fields):
     """
-    fields: [{'name': 'density', 'converter': int,   'length': 3},
-             {'name': 'opacity', 'converter': float, 'length': 7}]
+    fields: (('density', 3, int),
+             ('opacity', 7, float))
     """
     lower = 0
     _fields = []
-    for field in fields:
-        assert field['length'] >= 1
-        _field = {k: v for k, v in field.items()}
-        upper = lower + field['length']
-        _field['lower'] = lower
-        _field['upper'] = upper
+    for name, length, converter in fields:
+        assert length >= 1
+        upper = lower + length
+        _field = (name, lower, upper, converter)
         lower = upper
         _fields.append(_field)
 
     def fixed_format_parser(s):
         assert len(s) >= upper
-        ret = {}
-        for field in _fields:
-            name = field['name']
-            f = field['converter']
-            l = field['lower']
-            u = field['upper']
-            ret[name] = f(s[l:u])
-        return ret
+        return {name: converter(s[lower:upper])
+                for name, lower, upper, converter
+                in _fields}
     return fixed_format_parser
 
 
@@ -112,16 +105,10 @@ class Tester(unittest.TestCase):
 
     def test_make_fixed_format_parser(self):
         with self.assertRaises(AssertionError):
-            make_fixed_format_parser([{'name': 'a',
-                                       'converter': int,
-                                       'length': 0}])
+            make_fixed_format_parser((('a', 0, int),))
         fixed_format_parser\
-            = make_fixed_format_parser([{'name': 'a',
-                                         'converter': int,
-                                         'length': 3},
-                                        {'name': 'b',
-                                         'converter': lambda x: -int(x),
-                                         'length': 7}])
+            = make_fixed_format_parser((('a', 3, int),
+                                        ('b', 7, lambda x: -int(x))))
         self.assertEqual(fixed_format_parser(' 325      '),
                          {'a': 32, 'b': -5})
         self.assertEqual(fixed_format_parser(' 325      \n'),
