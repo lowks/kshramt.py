@@ -6,7 +6,7 @@ import pprint
 import math
 
 
-__version__ = '0.0.5'
+__version__ = '0.0.6'
 
 
 class Error(Exception):
@@ -80,11 +80,11 @@ def flatten(xss):
                 yield xs
 
 
-def list_2d(n_row, n_column):
+def list_2d(n_row, n_column, init=None):
     assert n_row >= 1
     assert n_column >= 1
 
-    return [[None
+    return [[init
              for _
              in range(n_column)]
             for _
@@ -205,6 +205,10 @@ class Tester(unittest.TestCase):
         self.assertEqual(list_2d(2, 3),
                          [[None, None, None],
                           [None, None, None]])
+
+        self.assertEqual(list_2d(2, 3, 0),
+                         [[0, 0, 0],
+                          [0, 0, 0]])
 
     def test_flatten(self):
         self.assertEqual(list(flatten([])), [])
