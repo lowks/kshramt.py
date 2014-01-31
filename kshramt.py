@@ -29,6 +29,24 @@ def memoize(f):
     return retf
 
 
+def profiled_memoize(f):
+    cache = {}
+    profile = {'new': 0,
+               'hit': 0}
+    def retf(*args):
+        if args in cache:
+            profile['hit'] += 1
+            return cache[args]
+        else:
+            profile['new'] += 1
+            retv = f(*args)
+            cache[args] = retv
+            return retv
+    retf.cache = cache
+    retf.profile = profile
+    return retf
+
+
 def _get_interval(lx):
     assert lx > 0
     dx = 10**(math.ceil(math.log10(lx)) - 1)
