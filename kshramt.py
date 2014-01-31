@@ -4,10 +4,9 @@ import unittest
 import collections
 import pprint
 import math
-import inspect
 
 
-__version__ = '0.0.7'
+__version__ = '0.0.8'
 
 
 class Error(Exception):
@@ -18,7 +17,6 @@ TICK_INTERVAL_PADDING_RATIO = 0.1
 
 
 def memo1(f):
-    assert len(inspect.getargspec(f).args) == 1
     cache = {}
     def retf(x):
         if x in cache:
