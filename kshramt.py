@@ -16,14 +16,14 @@ class Error(Exception):
 TICK_INTERVAL_PADDING_RATIO = 0.1
 
 
-def memo1(f):
+def memoize(f):
     cache = {}
-    def retf(x):
-        if x in cache:
-            return cache[x]
+    def retf(*args):
+        if args in cache:
+            return cache[args]
         else:
-            retv = f(x)
-            cache[x] = retv
+            retv = f(*args)
+            cache[args] = retv
             return retv
     retf.cache = cache
     return retf
