@@ -1,12 +1,12 @@
-import sys
-import argparse
-import unittest
-import collections
-import pprint
-import math
+import sys as _sys
+import argparse as _argparse
+import unittest as _unittest
+import collections as _collections
+import pprint as _pprint
+import math as _math
 
 
-__version__ = '0.0.8'
+__version__ = '0.0.10'
 
 
 class Error(Exception):
@@ -49,7 +49,7 @@ def profiled_memoize(f):
 
 def _get_interval(lx):
     assert lx > 0
-    dx = 10**(math.ceil(math.log10(lx)) - 1)
+    dx = 10**(_math.ceil(_math.log10(lx)) - 1)
     if lx > 5*dx:
         return dx
     elif lx > 2*dx:
@@ -61,7 +61,7 @@ def _get_interval(lx):
 def _get_lower_limit(x, dx,
                      padding_ratio=TICK_INTERVAL_PADDING_RATIO):
     assert dx > 0
-    lower = math.floor(x/dx)*dx
+    lower = _math.floor(x/dx)*dx
     if x <= lower + dx*padding_ratio:
         lower -= dx
     return lower
@@ -70,7 +70,7 @@ def _get_lower_limit(x, dx,
 def _get_upper_limit(x, dx,
                      padding_ratio=TICK_INTERVAL_PADDING_RATIO):
     assert dx > 0
-    upper = math.ceil(x/dx)*dx
+    upper = _math.ceil(x/dx)*dx
     if x >= upper - dx*padding_ratio:
         upper += dx
     return upper
@@ -86,7 +86,7 @@ def get_tick_configurations(x1, x2,
 
 
 def pp(x):
-    pprint.pprint(x, stream=sys.stderr)
+    _pprint.pprint(x, stream=_sys.stderr)
     return x
 
 
@@ -104,7 +104,7 @@ def flatten(xss):
         yield xss
     else:
         for xs in xss:
-            if isinstance(xs, collections.Iterable):
+            if isinstance(xs, _collections.Iterable):
                 for x in flatten(xs):
                     yield x
             else:
@@ -147,11 +147,11 @@ def make_fixed_format_parser(fields):
     return fixed_format_parser
 
 
-class TestAction(argparse.Action):
+class TestAction(_argparse.Action):
     def __init__(self,
                  option_strings,
-                 dest=argparse.SUPPRESS,
-                 default=argparse.SUPPRESS,
+                 dest=_argparse.SUPPRESS,
+                 default=_argparse.SUPPRESS,
                  help=None):
         super().__init__(option_strings=option_strings,
                          dest=dest,
@@ -161,11 +161,11 @@ class TestAction(argparse.Action):
 
 
     def __call__(self, parser, namespace, values, option_string=None):
-        unittest.main(argv=sys.argv[:1])
+        _unittest.main(argv=_sys.argv[:1])
         parser.exit()
 
 
-class Tester(unittest.TestCase):
+class _Tester(_unittest.TestCase):
     def test__get_interval(self):
         with self.assertRaises(AssertionError):
             _get_interval(-1)
@@ -268,4 +268,4 @@ class Tester(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    _unittest.main()
