@@ -6,7 +6,7 @@ import pprint as _pprint
 import math as _math
 
 
-__version__ = '0.0.10'
+__version__ = '0.0.11'
 
 
 class Error(Exception):
@@ -22,8 +22,7 @@ def memoize(f):
         if args in cache:
             return cache[args]
         else:
-            retv = f(*args)
-            cache[args] = retv
+            cache[args] = retv = f(*args)
             return retv
     retf.cache = cache
     return retf
@@ -39,8 +38,7 @@ def profiled_memoize(f):
             return cache[args]
         else:
             profile['new'] += 1
-            retv = f(*args)
-            cache[args] = retv
+            cache[args] = retv = f(*args)
             return retv
     retf.cache = cache
     retf.profile = profile
