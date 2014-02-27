@@ -4,6 +4,8 @@ import unittest as _unittest
 import collections as _collections
 import pprint as _pprint
 import math as _math
+import functools as _functools
+import operator as _operator
 
 
 __version__ = '0.0.11'
@@ -14,6 +16,18 @@ class Error(Exception):
 
 
 TICK_INTERVAL_PADDING_RATIO = 0.1
+
+
+def reshape(xs, ns):
+    assert ns
+    assert len(xs) == _functools.reduce(_operator.mul, ns, 1)
+    return _reshape(xs, ns)
+
+
+def _reshape(xs, ns):
+    if len(ns) == 1:
+        return xs
+    return _reshape(partition(xs, ns[-1]), ns[0:-1])
 
 
 def partition(xs, n):
@@ -171,6 +185,21 @@ class TestAction(_argparse.Action):
 
 
 class _Tester(_unittest.TestCase):
+    def test_reshape(self):
+        with self.assertRaises(AssertionError):
+            reshape((1,), ())
+        with self.assertRaises(AssertionError):
+            reshape((1, 2, 3), (2, 2))
+
+        for xs, ns, expected in (
+                ([1, 2, 3], (3,), [1, 2, 3]),
+                ([1, 2, 3], (3, 1), [[1], [2], [3]]),
+                ([1, 2, 3, 4], (2, 2), [[1, 2], [3, 4]]),
+                ([1, 2, 3, 4, 5, 6], (2, 3), [[1, 2, 3], [4, 5, 6]]),
+                ([1, 2, 3, 4, 5, 6, 7, 8], (2, 2, 2), [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]),
+        ):
+            self.assertEqual(reshape(xs, ns), expected)
+
     def test_partition(self):
         with self.assertRaises(ValueError):
             partition((1, 2), 0)
