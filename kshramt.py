@@ -6,6 +6,8 @@ import pprint as _pprint
 import math as _math
 import functools as _functools
 import operator as _operator
+import multiprocessing as _multiprocessing
+import itertools as _itertools
 
 
 __version__ = '0.0.11'
@@ -16,6 +18,11 @@ class Error(Exception):
 
 
 TICK_INTERVAL_PADDING_RATIO = 0.1
+
+
+def parallel_for(f, *indicess):
+    return reshape(_multiprocessing.Pool().starmap(f, _itertools.product(*indicess)),
+                   [len(indices) for indices in indicess])
 
 
 def reshape(xs, ns):
@@ -184,7 +191,14 @@ class TestAction(_argparse.Action):
         parser.exit()
 
 
+def _fn_for_test_parallel_for(x, y):
+    return x, y
+
+
 class _Tester(_unittest.TestCase):
+    def test_parallel_for(self):
+        self.assertEqual(parallel_for(_fn_for_test_parallel_for, [1, 2], [3, 4, 5]), [[(1, 3), (1, 4), (1, 5)], [(2, 3), (2, 4), (2, 5)]])
+
     def test_reshape(self):
         with self.assertRaises(AssertionError):
             reshape((1,), ())
