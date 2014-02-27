@@ -18,21 +18,21 @@ TICK_INTERVAL_PADDING_RATIO = 0.1
 
 def memoize(f):
     cache = {}
-    def retf(*args):
+    def memoized_f(*args):
         if args in cache:
             return cache[args]
         else:
             cache[args] = retv = f(*args)
             return retv
-    retf.cache = cache
-    return retf
+    memoized_f.cache = cache
+    return memoized_f
 
 
 def profiled_memoize(f):
     cache = {}
     profile = {'new': 0,
                'hit': 0}
-    def retf(*args):
+    def profiled_memoized_f(*args):
         if args in cache:
             profile['hit'] += 1
             return cache[args]
@@ -40,9 +40,9 @@ def profiled_memoize(f):
             profile['new'] += 1
             cache[args] = retv = f(*args)
             return retv
-    retf.cache = cache
-    retf.profile = profile
-    return retf
+    profiled_memoized_f.cache = cache
+    profiled_memoized_f.profile = profile
+    return profiled_memoized_f
 
 
 def _get_interval(lx):
