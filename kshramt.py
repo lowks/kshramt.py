@@ -16,6 +16,13 @@ class Error(Exception):
 TICK_INTERVAL_PADDING_RATIO = 0.1
 
 
+def partition(xs, n):
+    ret = []
+    for i in range(n, len(xs) + 1, n):
+        ret.append(xs[i - n:i])
+    return ret
+
+
 def memoize(f):
     cache = {}
     def memoized_f(*args):
@@ -164,6 +171,23 @@ class TestAction(_argparse.Action):
 
 
 class _Tester(_unittest.TestCase):
+    def test_partition(self):
+        with self.assertRaises(ValueError):
+            partition((1, 2), 0)
+
+        for xs, n, expected in (
+                ((), -1, []),
+                ((1, 2), -1, []),
+
+                ((), 1, []),
+                ((), 2, []),
+
+                ([1, 3], 1, [[1], [3]]),
+                ([1, 4], 2, [[1, 4]]),
+                ([1, 5], 3, []),
+        ):
+            self.assertEqual(partition(xs, n), expected)
+
     def test__get_interval(self):
         with self.assertRaises(AssertionError):
             _get_interval(-1)
