@@ -20,6 +20,11 @@ class Error(Exception):
 TICK_INTERVAL_PADDING_RATIO = 0.1
 
 
+def each_cons(xs, n):
+    assert n >= 1
+    return [xs[i:i+n] for i in range(len(xs) - (n - 1))]
+
+
 def parallel_for(f, *indicess):
     return reshape(_multiprocessing.Pool().starmap(f, _itertools.product(*indicess)),
                    [len(indices) for indices in indicess])
@@ -196,6 +201,20 @@ def _fn_for_test_parallel_for(x, y):
 
 
 class _Tester(_unittest.TestCase):
+
+    def test_each_cons(self):
+        with self.assertRaises(AssertionError):
+            each_cons([1, 2, 3], 0)
+
+        for xs, n, expected in (
+                ([], 1, [],),
+                ([1, 2, 3], 1, [[1], [2], [3]],),
+                ([1, 2, 3], 2, [[1, 2], [2, 3]],),
+                ([1, 2, 3], 3, [[1, 2, 3]],),
+                ([1, 2, 3], 4, [],),
+        ):
+            self.assertEqual(each_cons(xs, n), expected)
+
     def test_parallel_for(self):
         self.assertEqual(parallel_for(_fn_for_test_parallel_for, [1, 2], [3, 4, 5]), [[(1, 3), (1, 4), (1, 5)], [(2, 3), (2, 4), (2, 5)]])
 
