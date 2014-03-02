@@ -161,14 +161,11 @@ def make_fixed_format_parser(fields):
     lower = 0
     _fields = []
     for field in fields:
-        if len(field) != 3:
-            exit('len(field) != 3 {}'.format(field))
         name, length, converter = field
         assert length >= 1
         upper = lower + length
-        _field = (name, lower, upper, converter)
+        _fields.append((name, lower, upper, converter))
         lower = upper
-        _fields.append(_field)
 
     def fixed_format_parser(s):
         assert len(s) >= upper
