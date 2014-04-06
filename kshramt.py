@@ -43,10 +43,7 @@ def _reshape(xs, ns):
 
 
 def partition(xs, n):
-    ret = []
-    for i in range(n, len(xs) + 1, n):
-        ret.append(xs[i - n:i])
-    return ret
+    return [xs[i-n:i] for i in range(n, len(xs) + 1, n)]
 
 
 def memoize(f):
