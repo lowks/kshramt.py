@@ -10,7 +10,7 @@ import multiprocessing as _multiprocessing
 import itertools as _itertools
 
 
-__version__ = '0.0.13'
+__version__ = '0.0.14'
 
 
 class Error(Exception):
