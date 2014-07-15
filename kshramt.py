@@ -20,6 +20,44 @@ class Error(Exception):
 TICK_INTERVAL_PADDING_RATIO = 0.1
 
 
+def is_in_convex_hull(px, py, xys, is_counterclockwise=True):
+    if not is_counterclockwise:
+        return is_in_convex_hull(px, py, list(reversed(xys)))
+    else:
+        assert is_convex(xys, is_counterclockwise)
+        x1, y1 = xys[0]
+        x1 -= px
+        y1 -= py
+        for x2, y2 in xys + xys[0:1]:
+            x2 -= px
+            y2 -= py
+            if x1*y2 - y1*x2 < 0:
+                return False
+            x1 = x2
+            y1 = y2
+        return True
+
+
+def is_convex(xys, is_counterclockwise=True):
+    if not is_counterclockwise:
+        return is_convex(list(reversed(xys)))
+    else:
+        assert len(xys) >= 3
+        (x1, y1), (x2, y2), *more = xys
+        for x3, y3 in more + xys[0:1]:
+            dx12 = x2 - x1
+            dy12 = y2 - y1
+            dx23 = x3 - x2
+            dy23 = y3 - y2
+            if dx12*dy23 - dy12*dx23 < 0:
+                return False
+            x1 = x2
+            y1 = y2
+            x2 = x3
+            y2 = y3
+        return True
+
+
 def each_cons(xs, n):
     assert n >= 1
     return [xs[i:i+n] for i in range(len(xs) - (n - 1))]
@@ -195,6 +233,51 @@ def _fn_for_test_parallel_for(x, y):
 
 
 class _Tester(_unittest.TestCase):
+
+    def test_is_in_convex_hull(self):
+        with self.assertRaises(AssertionError):
+            is_in_convex_hull(1, 2, [(0, 0),
+                                     (1, 0),
+                                     (1, -1)])
+        self.assertTrue(is_in_convex_hull(0, 0, [(0, 0),
+                                                 (1, 0),
+                                                 (1, 1)]))
+        xys = [(0, 0),
+               (2, 0),
+               (2, 1),
+               (2, 2),
+               (1, 2)]
+        self.assertTrue(is_in_convex_hull(1, 1, xys))
+        self.assertTrue(is_in_convex_hull(1, 1, list(reversed(xys)), False))
+        self.assertFalse(is_in_convex_hull(3, 3, xys))
+
+    def test_is_convex(self):
+        with self.assertRaises(AssertionError):
+            is_convex([])
+        with self.assertRaises(AssertionError):
+            is_convex([(1, 2)])
+        with self.assertRaises(AssertionError):
+            is_convex([(1, 2), (3, 4)])
+        self.assertTrue(is_convex([(0, 0),
+                                   (1, 0),
+                                   (0.5, 1)]))
+        self.assertTrue(is_convex([(0, 0),
+                                   (1, 0),
+                                   (1, 1),
+                                   (1, 2),
+                                   (0, 1)]))
+        self.assertFalse(is_convex([(0, 0),
+                                    (1, 0),
+                                    (0.5, 1),
+                                    (0, 5)]))
+        self.assertFalse(is_convex([(0, 0),
+                                    (0.5, 1),
+                                    (1, 0)]))
+        self.assertTrue(is_convex([(0, 0),
+                                   (0.5, 1),
+                                   (1, 0)],
+                                  False))
+
 
     def test_each_cons(self):
         with self.assertRaises(AssertionError):
