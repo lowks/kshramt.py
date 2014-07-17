@@ -28,7 +28,7 @@ def is_in_convex_hull(px, py, xys, is_counterclockwise=True):
         x1, y1 = xys[0]
         x1 -= px
         y1 -= py
-        for x2, y2 in xys + xys[0:1]:
+        for x2, y2 in _itertools.chain(xys, xys[0:1]):
             x2 -= px
             y2 -= py
             if x1*y2 - y1*x2 < 0:
@@ -44,7 +44,7 @@ def is_convex(xys, is_counterclockwise=True):
     else:
         assert len(xys) >= 3
         (x1, y1), (x2, y2), *more = xys
-        for x3, y3 in more + xys[0:1]:
+        for x3, y3 in _itertools.chain(more, xys[0:1]):
             dx12 = x2 - x1
             dy12 = y2 - y1
             dx23 = x3 - x2
