@@ -90,7 +90,7 @@ def sphere_mesh(n=0, r=1, base=20):
     for _ in range(0, n):
         new_triangles = []
         for triangle in triangles:
-            new_triangles = _itertools.chain(new_triangles, _divide_triangle(triangle, points_))
+            new_triangles.extend(_divide_triangle(triangle, points_))
         triangles = new_triangles
     return list(triangles), [(r*x, r*y, r*z) for x, y, z in points_]
 
