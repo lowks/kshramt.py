@@ -10,7 +10,7 @@ import multiprocessing as _multiprocessing
 import itertools as _itertools
 
 
-__version__ = '0.0.14'
+__version__ = '0.0.15'
 
 
 class Error(Exception):
@@ -18,6 +18,109 @@ class Error(Exception):
 
 
 TICK_INTERVAL_PADDING_RATIO = 0.1
+
+
+GOLDEN_RATIO = (1 + _math.sqrt(5))/2
+_SPHERE_MESH_BASES = {
+    4: ([(0, 1, 2),
+         (1, 2, 3),
+         (2, 3, 0),
+         (0, 1, 3)],
+        [(0, 0, 1),
+         (2*_math.sqrt(2)/3, 0, -1/3),
+         (-_math.sqrt(2)/3, _math.sqrt(2/3), -1/3),
+         (-_math.sqrt(2)/3, -_math.sqrt(2/3), -1/3)],
+        1),
+    8: ([(4, 0, 1),
+         (4, 1, 2),
+         (4, 2, 3),
+         (4, 3, 0),
+         (5, 0, 1),
+         (5, 1, 2),
+         (5, 2, 3),
+         (5, 3, 0)],
+        [(1, 0, 0),
+         (0, 1, 0),
+         (-1, 0, 0),
+         (0, -1, 0),
+         (0, 0, 1),
+         (0, 0, -1)],
+        1),
+    # http://en.wikipedia.org/wiki/Icosahedron#Cartesian_coordinates
+    20: ([(8, 9, 5),
+          (8, 9, 4),
+          (7, 5, 2),
+          (7, 5, 3),
+          (3, 1, 9),
+          (3, 1, 11),
+          (4, 6, 1),
+          (4, 6, 0),
+          (0, 2, 8),
+          (0, 2, 10),
+          (10, 11, 6),
+          (10, 11, 7),
+          (2, 8, 5),
+          (8, 4, 0),
+          (0, 6, 10),
+          (10, 7, 2),
+          (5, 3, 9),
+          (9, 4, 1),
+          (1, 6, 11),
+          (11, 3, 7)],
+         [(0, 1, GOLDEN_RATIO),
+          (0, 1, -GOLDEN_RATIO),
+          (0, -1, GOLDEN_RATIO),
+          (0, -1, -GOLDEN_RATIO),
+          (1, GOLDEN_RATIO, 0),
+          (1, -GOLDEN_RATIO, 0),
+          (-1, GOLDEN_RATIO, 0),
+          (-1, -GOLDEN_RATIO, 0),
+          (GOLDEN_RATIO, 0, 1),
+          (GOLDEN_RATIO, 0, -1),
+          (-GOLDEN_RATIO, 0, 1),
+          (-GOLDEN_RATIO, 0, -1)],
+         _math.sqrt(1**2 + GOLDEN_RATIO**2)),
+}
+def sphere_mesh(n=0, r=1, base=20):
+    assert n >= 0
+    triangles, points, r_ = _SPHERE_MESH_BASES[base]
+    points_ = []
+    for x, y, z in points:
+        points_.append((r*x/r_, r*y/r_, r*z/r_))
+    for _ in range(0, n):
+        new_triangles = []
+        for triangle in triangles:
+            new_triangles = _itertools.chain(new_triangles, _divide_triangle(triangle, points_))
+        triangles = new_triangles
+    return list(triangles), points_
+
+
+def _divide_triangle(triangle, points):
+    i_p1, i_p2, i_p3 = triangle
+    p1 = points[i_p1]
+    p2 = points[i_p2]
+    p3 = points[i_p3]
+    n_points = len(points)
+    p12 = _unit_middle_point(p1, p2)
+    points.append(p12)
+    i_p12 = n_points + 0
+    p23 = _unit_middle_point(p2, p3)
+    points.append(p23)
+    i_p23 = n_points + 1
+    p31 = _unit_middle_point(p3, p1)
+    points.append(p31)
+    i_p31 = n_points + 2
+    return (i_p1, i_p12, i_p31), (i_p2, i_p12, i_p23), (i_p3, i_p23, i_p31), (i_p12, i_p23, i_p31)
+
+
+def _unit_middle_point(p1, p2):
+    x1, y1, z1 = p1
+    x2, y2, z2 = p2
+    x = (x1 + x2)/2
+    y = (y1 + y2)/2
+    z = (z1 + z2)/2
+    r = _math.sqrt(x**2 + y**2 + z**2)
+    return x/r, y/r, z/r
 
 
 def is_in_convex_hull(px, py, xys, is_counterclockwise=True):
@@ -233,6 +336,22 @@ def _fn_for_test_parallel_for(x, y):
 
 
 class _Tester(_unittest.TestCase):
+
+    def test_sphere_mesh(self):
+        triangles, points = sphere_mesh(n=2, base=4)
+        self.assertEqual(len(triangles), 4**3)
+        self.assertEqual(len(points), 4**3)
+
+    def test__divide_triangle(self):
+        points = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]
+        triangles = _divide_triangle((0, 1, 2), points)
+        self.assertEqual(triangles, ((0, 3, 5), (1, 3, 4), (2, 4, 5), (3, 4, 5)))
+        self.assertEqual(points, [(0, 0, 1),
+                                  (1, 0, 0),
+                                  (0, 1, 0),
+                                  (0.7071067811865475, 0.0, 0.7071067811865475),
+                                  (0.7071067811865475, 0.7071067811865475, 0.0),
+                                  (0.0, 0.7071067811865475, 0.7071067811865475)])
 
     def test_is_in_convex_hull(self):
         with self.assertRaises(AssertionError):
