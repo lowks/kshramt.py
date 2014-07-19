@@ -10,7 +10,7 @@ import multiprocessing as _multiprocessing
 import itertools as _itertools
 
 
-__version__ = '0.0.15'
+__version__ = '0.0.16'
 
 
 class Error(Exception):
@@ -86,13 +86,13 @@ def sphere_mesh(n=0, r=1, base=20):
     triangles, points, r_ = _SPHERE_MESH_BASES[base]
     points_ = []
     for x, y, z in points:
-        points_.append((r*x/r_, r*y/r_, r*z/r_))
+        points_.append((x/r_, y/r_, z/r_))
     for _ in range(0, n):
         new_triangles = []
         for triangle in triangles:
             new_triangles = _itertools.chain(new_triangles, _divide_triangle(triangle, points_))
         triangles = new_triangles
-    return list(triangles), points_
+    return list(triangles), [(r*x, r*y, r*z) for x, y, z in points_]
 
 
 def _divide_triangle(triangle, points):
