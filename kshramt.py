@@ -10,7 +10,7 @@ import multiprocessing as _multiprocessing
 import itertools as _itertools
 
 
-__version__ = '0.0.17'
+__version__ = '0.0.18'
 
 
 class Error(Exception):
@@ -18,6 +18,17 @@ class Error(Exception):
 
 
 TICK_INTERVAL_PADDING_RATIO = 0.1
+
+
+def linspace(start, stop, num=50):
+    if num < 1:
+        return []
+    elif num == 1:
+        return [start]
+    step = (stop - start)/(num - 1)
+    ret = [start + step*i for i in range(num - 1)]
+    ret.append(stop)
+    return ret
 
 
 GOLDEN_RATIO = (1 + _math.sqrt(5))/2
@@ -334,6 +345,10 @@ def _fn_for_test_parallel_for(x, y):
 
 
 class _Tester(_unittest.TestCase):
+
+    def test_linspace(self):
+        for x, y in zip(linspace(0, 10, 11), list(range(11))):
+            self.assertAlmostEqual(x, y)
 
     def test_sphere_mesh(self):
         triangles, points = sphere_mesh(n=2, base=4)
