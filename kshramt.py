@@ -10,7 +10,7 @@ import multiprocessing as _multiprocessing
 import itertools as _itertools
 
 
-__version__ = '0.0.19'
+__version__ = '0.0.20'
 
 
 class Error(Exception):
@@ -55,7 +55,7 @@ def binning(xs, bins):
 
 
 def min_max(xs):
-    assert xs
+    assert len(xs)
     min_ = max_ = xs[0]
     for x in xs[1:]:
         if x > max_:
@@ -226,7 +226,7 @@ def parallel_for(f, *indicess):
 
 
 def reshape(xs, ns):
-    assert ns
+    assert len(ns)
     assert len(xs) == _functools.reduce(_operator.mul, ns, 1)
     return _reshape(xs, ns)
 
